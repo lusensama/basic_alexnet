@@ -165,7 +165,7 @@ def main_worker(gpu, ngpus_per_node, args):
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
     optimizer = torch.optim.Adam(model.parameters(), args.lr,
-                                momentum=args.momentum,
+                                # momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
