@@ -130,6 +130,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model = alexnet(pretrained=True)
     else:
         print("=> creating model '{}'".format(args.arch))
+        # import torchvision.models as models
+        # model = models.alexnet()
         model = alexnet()
 
     if args.distributed:
@@ -164,8 +166,8 @@ def main_worker(gpu, ngpus_per_node, args):
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
-    optimizer = torch.optim.Adam(model.parameters(), args.lr,
-                                # momentum=args.momentum,
+    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+                                momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
@@ -395,7 +397,7 @@ class ProgressMeter(object):
 
 def adjust_learning_rate(optimizer, epoch, args):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    lr = args.lr * (0.5 ** (epoch // 10))
+    lr = args.lr * (0.1 ** (epoch // 15))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
