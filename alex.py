@@ -47,7 +47,7 @@ class BinConv2d(nn.Module): # change the name of BinConv2d
 
 
 class AlexNet(nn.Module):
-    def __init__(self, num_classes=1000):
+    def __init__(self, num_classes=200):
         super(AlexNet, self).__init__()
         self.num_classes = num_classes
         self.features = nn.Sequential(

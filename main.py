@@ -400,11 +400,13 @@ class ProgressMeter(object):
 
 def adjust_learning_rate(optimizer, epoch, lr):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    if epoch == 15:
+    if lr<15:
+        pass
+    elif 15 <= epoch < 25:
         lr = lr * (0.1 ** 1)
-    elif epoch == 25:
+    elif 25 <= epoch < 30:
         lr = lr * (0.1 ** 2)
-    elif epoch == 30:
+    elif epoch >= 30:
         lr = lr * (0.1 ** 3)
     else:
         pass
