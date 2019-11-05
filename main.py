@@ -17,7 +17,7 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
-from alex import alexnet
+from alex import alexnet, vgg_net
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -132,7 +132,7 @@ def main_worker(gpu, ngpus_per_node, args):
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
         # model = models.alexnet()
-        model = alexnet()
+        model = vgg_net()
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor
