@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
                     help='path to dataset')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='alexnet',
-                    help='alexnet only')
+                    help='alexnet and vgg only')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=60, type=int, metavar='N',
@@ -51,7 +51,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                    help='use pre-trained model')
+                    help='use pre-trained model', default=False)
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -125,14 +125,14 @@ def main_worker(gpu, ngpus_per_node, args):
         dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                                 world_size=args.world_size, rank=args.rank)
     # create model
-    if args.pretrained:
+    if args.arch == 'alexnet':
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = alexnet(pretrained=True)
+        model = alexnet(pretrained=args.pretrained)
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
         # model = models.alexnet()
-        model = vgg_net()
+        model = vgg_net(pretrained=args.pretrained)
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor

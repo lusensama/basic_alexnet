@@ -136,21 +136,31 @@ class Vgg(nn.Module):
         )
         self.classifier = nn.Sequential(
             nn.Dropout(self.dropout_ratio),         # classifier:add(nn.Dropout(0.1))
-            nn.Linear(512 * 7 * 7, 4096),           # classifier:add(nn.Linear(512,512,false))
+            nn.Linear(512 * 7 * 7, 4096,bias=False),# classifier:add(nn.Linear(512,512,false))
             nn.ReLU(True),                          # classifier:add(ReLU(true))
             nn.Dropout(self.dropout_ratio),         # classifier:add(nn.Dropout(0.1))
-            nn.Linear(4096, 4096),                  # classifier:add(nn.Linear(512,10,false))
+            nn.Linear(4096, 4096,bias=False),       # classifier:add(nn.Linear(512,10,false))
             nn.ReLU(True),                          # classifier:add(ReLU(true))
             nn.Dropout(self.dropout_ratio),         # additional dropout
-            nn.Linear(4096, num_classes),           # additional dense layer
+            nn.Linear(4096, num_classes,bias=False),# additional dense layer
         )
-        # self._initialize_weights()
+        self._initialize_weights()
 
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), -1)                    # model:add(nn.View(512))
         x = self.classifier(x)
         return x
+
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                # nn.init.constant_(m.bias, 0)
 
 def vgg_net(pretrained=False, **kwargs):
     r"""AlexNet model architecture from the
