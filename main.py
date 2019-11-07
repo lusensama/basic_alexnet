@@ -258,7 +258,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
                 'optimizer' : optimizer.state_dict(),
-            }, is_best)
+            }, is_best, filename=args.arch)
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args, writer):
@@ -352,9 +352,9 @@ def validate(val_loader, model, criterion, args):
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    torch.save(state, filename)
+    torch.save(state, filename+'_checkpoint.pth.tar')
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        shutil.copyfile(filename+'_checkpoint.pth.tar', filename+'model_best.pth.tar')
 
 
 class AverageMeter(object):
@@ -400,9 +400,9 @@ class ProgressMeter(object):
 
 def adjust_learning_rate(optimizer, epoch, lr):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    if epoch<15:
+    if epoch<14:
         pass
-    elif 15 <= epoch < 20:
+    elif 14 <= epoch < 20:
         lr = lr * (0.1 ** 1)
     elif 20 <= epoch < 25:
         lr = lr * (0.1 ** 2)
