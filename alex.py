@@ -76,6 +76,44 @@ class AlexNet(nn.Module):
         x = self.classifier(x)
         return x
 
+class AlexNet_flatten(nn.Module):
+    def __init__(self, num_classes=1000):
+        super(AlexNet_flatten, self).__init__()
+        self.num_classes = num_classes
+        self.dr = 0.1
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=2, bias=False),
+            # nn.BatchNorm2d(96, eps=1e-4, momentum=0.1, affine=True),
+            nn.ReLU(inplace=True),
+            nn.AvgPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(96, 256, kernel_size=5, stride=1, padding=2, groups=1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.AvgPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(256, 384, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Dropout(self.dr),
+            nn.Conv2d(384, 384, kernel_size=3, stride=1, padding=1, groups=1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Dropout(self.dr),
+            nn.Conv2d(384, 256, kernel_size=3, stride=1, padding=1, groups=1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.AvgPool2d(kernel_size=3, stride=2),
+        )
+        self.classifier = nn.Sequential(
+            nn.Linear(256 * 6 * 6, 4096, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Dropout(self.dr),
+            nn.Linear(4096, 4096, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes, bias=False),
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), 256 * 6 * 6)
+        x = self.classifier(x)
+        return x
+
 def alexnet(pretrained=False, **kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
@@ -84,10 +122,11 @@ def alexnet(pretrained=False, **kwargs):
     """
     model = AlexNet(**kwargs)
     if pretrained:
-        model_path = 'alexnet.pth.tar'
+        model_path = 'alexnet_best_51.pth.tar'
         # model_path = 'alexnet_XNOR_cpu.pth'
         pretrained_model = torch.load(model_path)
-        model.load_state_dict(pretrained_model['state_dict'], strict=False)
+        model.features = torch.nn.DataParallel(model.features)
+        model.load_state_dict(pretrained_model['state_dict'], strict=True)
     return model
 
 class ConvReLU(nn.Module): # change the name of BinConv2d
@@ -184,4 +223,89 @@ def vgg_net(pretrained=False, **kwargs):
         model.cuda()
         model.load_state_dict(pretrained_model['state_dict'])
         # model.load_state_dict(pretrained_model['state_dict'], strict=True)
+    return model
+
+class VGG_15(nn.Module):
+    def __init__(self,  dr=0.1, num_classes=1000):
+        super(VGG_15, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.AvgPool2d((2, 2), (2, 2)),
+            nn.Conv2d(64, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(128, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.AvgPool2d((2, 2), (2, 2)),
+            nn.Conv2d(128, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+            nn.Conv2d(256, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+            nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.ReLU(),
+            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
+        )
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.1),
+            nn.Linear(25088, 4096, bias=False),  # Linear,
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(4096, 1000, bias=False)  # Linear,
+
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
+
+def vgg_15(pretrained=False, **kwargs):
+    r"""AlexNet model architecture from the
+    `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    """
+    model = VGG_15(**kwargs)
+    if pretrained:
+        model_path = 'vgg15_gpu.pth'
+        # model_path = 'alexnet_XNOR_cpu.pth'
+        pretrained_model = torch.load(model_path)
+        # from collections import OrderedDict
+        # new_state_dict = OrderedDict()
+        # for k, v in pretrained_model.items():
+        #     name = k.replace(".module", "")  # remove `module.`
+        #     new_state_dict[name] = v
+        # load params
+
+        # model.load_state_dict(pretrained_model, strict=True)
+        model.features = torch.nn.DataParallel(model.features)
+        model.cuda()
+        # torch.save(model.state_dict(), 'vgg15_gpu.pth')
+        model.load_state_dict(pretrained_model, strict=True)
     return model

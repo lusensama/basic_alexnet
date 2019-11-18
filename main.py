@@ -17,7 +17,7 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
-from alex import alexnet, vgg_net
+from alex import alexnet, vgg_net, vgg_15
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -128,10 +128,17 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.arch == 'alexnet':
         print("=> using pre-trained model '{}'".format(args.arch))
         model = alexnet(pretrained=args.pretrained)
+    elif args.arch == 'vgg16':
+        print("=> creating model '{}'".format(args.arch))
+        model = vgg_net(pretrained=args.pretrained)
+
+    elif args.arch == 'vgg15':
+        print("=> creating model '{}'".format(args.arch))
+        model = vgg_15(pretrained=args.pretrained)
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
-        # model = models.alexnet()
+        # model = alexnet_flatten()
         model = vgg_net(pretrained=args.pretrained)
 
     if args.distributed:
@@ -318,6 +325,7 @@ def validate(val_loader, model, criterion, args):
         prefix='Test: ')
 
     # switch to evaluate mode
+    # model.train()
     model.eval()
 
     with torch.no_grad():
@@ -402,14 +410,20 @@ def adjust_learning_rate(optimizer, epoch, lr):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
     if epoch<14:
         pass
-    elif 14 <= epoch < 20:
+    elif 14 <= epoch < 24:
         lr = lr * (0.1 ** 1)
-    elif 20 <= epoch < 25:
+    elif 24 <= epoch < 30:
         lr = lr * (0.1 ** 2)
-    elif 25 <= epoch < 30:
+    elif 27 <= epoch < 30:
         lr = lr * (0.1 ** 3)
-    elif epoch >= 30:
-        lr = lr * (0.1 ** 4)
+    elif 35 <= epoch < 40:
+        lr = lr * (0.1 ** 3)
+    elif 42 <= epoch < 44:
+        lr = lr * (0.1 ** 3)*(0.5**1)
+    elif 44 <= epoch < 46:
+        lr = lr * (0.1 ** 3)*(0.5**2)
+    elif epoch >= 46:
+        lr = lr * (0.1 ** 3)*(0.5**1)
     else:
         pass
     # lr = args.lr * (0.1 ** (epoch // 15))
