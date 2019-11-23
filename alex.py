@@ -225,6 +225,7 @@ def vgg_net(pretrained=False, **kwargs):
         # model.load_state_dict(pretrained_model['state_dict'], strict=True)
     return model
 
+
 class VGG_15(nn.Module):
     def __init__(self,  dr=0.1, num_classes=1000):
         super(VGG_15, self).__init__()
@@ -233,14 +234,14 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.MaxPool2d((2, 2), (2, 2)),
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2)),
             nn.Conv2d(64, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(128, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.MaxPool2d((2, 2), (2, 2)),
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2)),
             nn.Conv2d(128, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -248,8 +249,8 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.Conv2d(256, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -257,8 +258,8 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -266,8 +267,8 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
-            nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+            nn.ReLU()
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
@@ -275,7 +276,6 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Linear(4096, 1000, bias=False)  # Linear,
-
         )
 
     def forward(self, x):
@@ -293,7 +293,8 @@ def vgg_15(pretrained=False, **kwargs):
     """
     model = VGG_15(**kwargs)
     if pretrained:
-        model_path = 'vgg15_gpu.pth'
+        model_path = 'model_list/vgg15_61.pth.tar'
+        print('loading pre-trained model from '+model_path)
         # model_path = 'alexnet_XNOR_cpu.pth'
         pretrained_model = torch.load(model_path)
         # from collections import OrderedDict
@@ -307,5 +308,5 @@ def vgg_15(pretrained=False, **kwargs):
         model.features = torch.nn.DataParallel(model.features)
         model.cuda()
         # torch.save(model.state_dict(), 'vgg15_gpu.pth')
-        model.load_state_dict(pretrained_model, strict=True)
+        model.load_state_dict(pretrained_model['state_dict'], strict=True)
     return model
