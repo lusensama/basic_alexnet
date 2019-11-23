@@ -234,14 +234,16 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
-            nn.MaxPool2d((2, 2), (2, 2)),
+
             nn.ReLU(),
+            nn.MaxPool2d((2, 2), (2, 2)),
             nn.Conv2d(64, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(128, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
-            nn.MaxPool2d((2, 2), (2, 2)),
+
             nn.ReLU(),
+            nn.MaxPool2d((2, 2), (2, 2)),
             nn.Conv2d(128, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -249,8 +251,9 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
-            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+
             nn.ReLU(),
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.Conv2d(256, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -258,8 +261,9 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+
+            nn.ReLU(),
             nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
-            nn.ReLU(),
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -267,8 +271,9 @@ class VGG_15(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
-            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
-            nn.ReLU()
+
+            nn.ReLU(),
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
