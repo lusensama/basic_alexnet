@@ -449,6 +449,7 @@ def adjust_learning_rate(optimizer, epoch, lr):
     #     lr = lr * (0.1 ** 3)*(0.5**1)
     else:
         pass
+    lr = lr * (0.5 ** (epoch // 20))
     # lr = args.lr * (0.1 ** (epoch // 15))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
