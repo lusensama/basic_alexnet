@@ -41,7 +41,7 @@ parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
                     metavar='LR', help='initial learning rate', dest='lr')
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                     help='momentum')
-parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
+parser.add_argument('--wd', '--weight-decay', default=5e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)',
                     dest='weight_decay')
 parser.add_argument('-p', '--print-freq', default=10, type=int,
@@ -140,6 +140,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # import torchvision.models as models
         # model = alexnet_flatten()
         model = vgg_net(pretrained=args.pretrained)
+        model = None
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor
@@ -218,8 +219,8 @@ def main_worker(gpu, ngpus_per_node, args):
     #     ]))
     ''' imagenet '''
     '''cifar100'''
-    normalize = transforms.Normalize(mean=[129.3, 124.1, 112.4],
-                                     std=[68.2,  65.4,  70.4])
+    normalize = transforms.Normalize(mean=[0.5,0.5,0.5],
+                                     std=[0.5,0.5,0.5])
 
     trainset = datasets.CIFAR100('/home/mdl/szl5689/code_space/basic_vgg/basic_alexnet/cifar100', train=True,
                                              transform=transforms.Compose([
