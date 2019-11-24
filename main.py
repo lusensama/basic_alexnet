@@ -204,36 +204,59 @@ def main_worker(gpu, ngpus_per_node, args):
     # Data loading code
     traindir = os.path.join(args.data, 'train')
     valdir = os.path.join(args.data, 'val')
+    ''' imagenet'''
+    # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+    #                                  std=[0.229, 0.224, 0.225])
+    #
+    # train_dataset = datasets.ImageFolder(
+    #     traindir,
+    #     transforms.Compose([
+    #         transforms.RandomResizedCrop(224),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ]))
+    ''' imagenet '''
+    '''cifar100'''
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    train_dataset = datasets.ImageFolder(
-        traindir,
-        transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            normalize,
-        ]))
+    trainset = datasets.CIFAR100('/cifar100', train=True,
+                                             transform=transforms.Compose([
+                                                 transforms.RandomCrop(32, padding=4),
+                                                 transforms.RandomHorizontalFlip(0.5),
+                                                 transforms.ToTensor(),
+                                                 normalize, ]),
+                                             target_transform=None, download=True)
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
+                                              shuffle=True, num_workers=2)
 
+    testset = datasets.CIFAR100('/cifar100', train=False,
+                                            transform=transforms.Compose([
+                                                transforms.ToTensor(),
+                                                normalize, ]),
+                                            target_transform=None, download=True)
+    val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
+                                             shuffle=False, num_workers=2)
+    '''cifar100'''
     if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)
     else:
         train_sampler = None
 
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
-        num_workers=args.workers, pin_memory=True, sampler=train_sampler)
-
-    val_loader = torch.utils.data.DataLoader(
-        datasets.ImageFolder(valdir, transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            normalize,
-        ])),
-        batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+    # train_loader = torch.utils.data.DataLoader(
+    #     train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
+    #     num_workers=args.workers, pin_memory=True, sampler=train_sampler)
+    #
+    # val_loader = torch.utils.data.DataLoader(
+    #     datasets.ImageFolder(valdir, transforms.Compose([
+    #         transforms.Resize(256),
+    #         transforms.CenterCrop(224),
+    #         transforms.ToTensor(),
+    #         normalize,
+    #     ])),
+    #     batch_size=args.batch_size, shuffle=False,
+    #     num_workers=args.workers, pin_memory=True)
 
     if args.evaluate:
         validate(val_loader, model, criterion, args)
@@ -410,20 +433,20 @@ def adjust_learning_rate(optimizer, epoch, lr):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
     if epoch<14:
         pass
-    elif 14 <= epoch < 24:
-        lr = lr * (0.1 ** 1)
-    elif 24 <= epoch < 30:
-        lr = lr * (0.1 ** 2)
-    elif 27 <= epoch < 30:
-        lr = lr * (0.1 ** 3)
-    elif 35 <= epoch < 40:
-        lr = lr * (0.1 ** 3)
-    elif 42 <= epoch < 44:
-        lr = lr * (0.1 ** 3)*(0.5**1)
-    elif 44 <= epoch < 46:
-        lr = lr * (0.1 ** 3)*(0.5**2)
-    elif epoch >= 46:
-        lr = lr * (0.1 ** 3)*(0.5**1)
+    # elif 14 <= epoch < 24:
+    #     lr = lr * (0.1 ** 1)
+    # elif 24 <= epoch < 30:
+    #     lr = lr * (0.1 ** 2)
+    # elif 27 <= epoch < 30:
+    #     lr = lr * (0.1 ** 3)
+    # elif 35 <= epoch < 40:
+    #     lr = lr * (0.1 ** 3)
+    # elif 42 <= epoch < 44:
+    #     lr = lr * (0.1 ** 3)*(0.5**1)
+    # elif 44 <= epoch < 46:
+    #     lr = lr * (0.1 ** 3)*(0.5**2)
+    # elif epoch >= 46:
+    #     lr = lr * (0.1 ** 3)*(0.5**1)
     else:
         pass
     # lr = args.lr * (0.1 ** (epoch // 15))
