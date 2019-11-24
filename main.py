@@ -233,7 +233,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                  normalize, ]),
                                              target_transform=None, download=True)
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
-                                              shuffle=True, num_workers=4)
+                                              shuffle=True, num_workers=1)
 
     testset = datasets.CIFAR100('./cifar100', train=False,
                                             transform=transforms.Compose([
@@ -241,7 +241,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                 normalize, ]),
                                             target_transform=None, download=True)
     val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
-                                             shuffle=False, num_workers=4)
+                                             shuffle=False, num_workers=1)
     '''cifar100'''
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)
