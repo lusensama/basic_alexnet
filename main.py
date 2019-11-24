@@ -19,7 +19,7 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 from alex import alexnet, vgg_net, vgg_15
 from torch.utils.tensorboard import SummaryWriter
-
+from actual_vgg import vgg16_bn
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
@@ -135,6 +135,9 @@ def main_worker(gpu, ngpus_per_node, args):
     elif args.arch == 'vgg15':
         print("=> creating model '{}'".format(args.arch))
         model = vgg_15(pretrained=args.pretrained)
+
+    elif args.arch == 'ovgg':
+        model = vgg16_bn()
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
@@ -174,8 +177,8 @@ def main_worker(gpu, ngpus_per_node, args):
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
-    optimizer = torch.optim.Adam(model.parameters(), args.lr,
-                                # momentum=args.momentum,
+    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+                                momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
@@ -219,10 +222,10 @@ def main_worker(gpu, ngpus_per_node, args):
     #     ]))
     ''' imagenet '''
     '''cifar100'''
-    normalize = transforms.Normalize(mean=[129.3, 124.1, 112.4],
-                                     std=[68.2,  65.4,  70.4])
+    normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
+                                     std=[0.5, 0.5, 0.5])
 
-    trainset = datasets.CIFAR100('/home/mdl/szl5689/code_space/basic_vgg/basic_alexnet/cifar100', train=True,
+    trainset = datasets.CIFAR100('./data', train=True,
                                              transform=transforms.Compose([
                                                  transforms.RandomCrop(32, padding=4),
                                                  transforms.RandomHorizontalFlip(0.5),
@@ -230,15 +233,15 @@ def main_worker(gpu, ngpus_per_node, args):
                                                  normalize, ]),
                                              target_transform=None, download=True)
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
-                                              shuffle=True, num_workers=2)
+                                              shuffle=True, num_workers=4)
 
-    testset = datasets.CIFAR100('/home/mdl/szl5689/code_space/basic_vgg/basic_alexnet/cifar100', train=False,
+    testset = datasets.CIFAR100('./data', train=False,
                                             transform=transforms.Compose([
                                                 transforms.ToTensor(),
                                                 normalize, ]),
                                             target_transform=None, download=True)
     val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
-                                             shuffle=False, num_workers=2)
+                                             shuffle=False, num_workers=4)
     '''cifar100'''
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(trainset)

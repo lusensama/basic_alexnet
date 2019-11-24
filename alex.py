@@ -328,3 +328,4 @@ def vgg_15(pretrained=False, **kwargs):
         # torch.save(model.state_dict(), 'vgg15_gpu.pth')
         model.load_state_dict(pretrained_model['state_dict'], strict=True)
     return model
+
