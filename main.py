@@ -221,7 +221,7 @@ def main_worker(gpu, ngpus_per_node, args):
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    trainset = datasets.CIFAR100('/cifar100', train=True,
+    trainset = datasets.CIFAR100('/home/mdl/szl5689/code_space/basic_vgg/basic_alexnet/cifar100', train=True,
                                              transform=transforms.Compose([
                                                  transforms.RandomCrop(32, padding=4),
                                                  transforms.RandomHorizontalFlip(0.5),
@@ -231,7 +231,7 @@ def main_worker(gpu, ngpus_per_node, args):
     train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
                                               shuffle=True, num_workers=2)
 
-    testset = datasets.CIFAR100('/cifar100', train=False,
+    testset = datasets.CIFAR100('/home/mdl/szl5689/code_space/basic_vgg/basic_alexnet/cifar100', train=False,
                                             transform=transforms.Compose([
                                                 transforms.ToTensor(),
                                                 normalize, ]),
