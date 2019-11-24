@@ -183,7 +183,7 @@ class Vgg(nn.Module):
             nn.Dropout(self.dropout_ratio),         # additional dropout
             nn.Linear(4096, num_classes,bias=False),# additional dense layer
         )
-        # self._initialize_weights()
+        self._initialize_weights()
 
     def forward(self, x):
         x = self.features(x)
