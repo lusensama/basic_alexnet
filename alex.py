@@ -146,7 +146,7 @@ class ConvReLU(nn.Module): # change the name of BinConv2d
 
 class Vgg(nn.Module):
 
-    def __init__(self, dr=0.1, num_classes=1000):
+    def __init__(self, dr=0.1, num_classes=100):
         super(Vgg, self).__init__()
         self.dropout_ratio = dr
         self.features = nn.Sequential(
@@ -175,7 +175,7 @@ class Vgg(nn.Module):
         )
         self.classifier = nn.Sequential(
             nn.Dropout(self.dropout_ratio),         # classifier:add(nn.Dropout(0.1))
-            nn.Linear(512 * 7 * 7, 4096,bias=False),# classifier:add(nn.Linear(512,512,false))
+            nn.Linear(512, 4096,bias=False),# classifier:add(nn.Linear(512,512,false))
             nn.ReLU(True),                          # classifier:add(ReLU(true))
             nn.Dropout(self.dropout_ratio),         # classifier:add(nn.Dropout(0.1))
             nn.Linear(4096, 4096,bias=False),       # classifier:add(nn.Linear(512,10,false))
