@@ -218,8 +218,8 @@ def main_worker(gpu, ngpus_per_node, args):
     #     ]))
     ''' imagenet '''
     '''cifar100'''
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+    normalize = transforms.Normalize(mean=[129.3, 124.1, 112.4],
+                                     std=[68.2,  65.4,  70.4])
 
     trainset = datasets.CIFAR100('/home/mdl/szl5689/code_space/basic_vgg/basic_alexnet/cifar100', train=True,
                                              transform=transforms.Compose([
