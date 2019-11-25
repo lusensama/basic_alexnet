@@ -283,7 +283,7 @@ class VGG_15(nn.Module):
             # nn.Linear(4096, 4096, bias=False),  # Linear,
             # nn.ReLU(),
             # nn.Dropout(0.1),
-            nn.Linear(4096, 10, bias=False)  # Linear,
+            nn.Linear(4096, 100, bias=False)  # Linear,
         )
 
         self._initialize_weights()
