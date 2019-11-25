@@ -41,7 +41,7 @@ parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
                     metavar='LR', help='initial learning rate', dest='lr')
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                     help='momentum')
-parser.add_argument('--wd', '--weight-decay', default=1e-8, type=float,
+parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)',
                     dest='weight_decay')
 parser.add_argument('-p', '--print-freq', default=10, type=int,
@@ -435,11 +435,11 @@ class ProgressMeter(object):
 
 def adjust_learning_rate(optimizer, epoch, lr):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    if epoch<14:
+    if epoch<81:
         pass
-    # elif 14 <= epoch < 24:
-    #     lr = lr * (0.1 ** 1)
-    # elif 24 <= epoch < 30:
+    elif 81 <= epoch < 122:
+        lr = lr * (0.1 ** 1)
+    # elif 122 <= epoch < 30:
     #     lr = lr * (0.1 ** 2)
     # elif 27 <= epoch < 30:
     #     lr = lr * (0.1 ** 3)
@@ -452,8 +452,8 @@ def adjust_learning_rate(optimizer, epoch, lr):
     # elif epoch >= 46:
     #     lr = lr * (0.1 ** 3)*(0.5**1)
     else:
-        pass
-    lr = lr * (0.5 ** (epoch // 40))
+        lr = lr * (0.1 ** 2)
+    # lr = lr * (0.5 ** (epoch // 40))
     # lr = args.lr * (0.1 ** (epoch // 15))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
