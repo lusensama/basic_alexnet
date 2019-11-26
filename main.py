@@ -17,7 +17,7 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
-from alex import alexnet, vgg_net, vgg_15
+from alex import alexnet, vgg_net, vgg_15_max, vgg_15_avg
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
 
@@ -132,10 +132,12 @@ def main_worker(gpu, ngpus_per_node, args):
         print("=> creating model '{}'".format(args.arch))
         model = vgg_net(pretrained=args.pretrained)
 
-    elif args.arch == 'vgg15':
+    elif args.arch == 'vgg15m':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15(pretrained=args.pretrained)
-
+        model = vgg_15_max(pretrained=args.pretrained)
+    elif args.arch == 'vgg15a':
+        print("=> creating model '{}'".format(args.arch))
+        model = vgg_15_avg(pretrained=args.pretrained)
     elif args.arch == 'ovgg':
         model = vgg16_bn()
     else:

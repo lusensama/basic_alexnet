@@ -344,14 +344,14 @@ class VGG_15_max(nn.Module):
             nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
 
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2)),
+            nn.MaxPool2d((2, 2), (2, 2)),
             nn.Conv2d(64, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
             nn.Conv2d(128, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
 
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2)),
+            nn.MaxPool2d((2, 2), (2, 2)),
             nn.Conv2d(128, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -361,7 +361,7 @@ class VGG_15_max(nn.Module):
             nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
 
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.Conv2d(256, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -371,7 +371,7 @@ class VGG_15_max(nn.Module):
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
 
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -381,7 +381,7 @@ class VGG_15_max(nn.Module):
             nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
 
             nn.ReLU(),
-            nn.AvgPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
+            nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
