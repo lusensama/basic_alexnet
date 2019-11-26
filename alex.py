@@ -316,7 +316,7 @@ def vgg_15_avg(pretrained=False, **kwargs):
     """
     model = VGG_15_avg(**kwargs)
     if pretrained:
-        model_path = 'model_list/vgg15_61.pth.tar'
+        model_path = 'vgg15avg.pth.tar'
         print('loading pre-trained model from '+model_path)
         # model_path = 'alexnet_XNOR_cpu.pth'
         pretrained_model = torch.load(model_path)
@@ -335,6 +335,66 @@ def vgg_15_avg(pretrained=False, **kwargs):
     return model
 
 class VGG_15_max(nn.Module):
+    # def __init__(self,  dr=0.1, num_classes=1000):
+    #     super(VGG_15_max, self).__init__()
+    #     self.features = nn.Sequential(
+    #         nn.Conv2d(3, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #
+    #         nn.ReLU(),
+    #         nn.MaxPool2d((2, 2), (2, 2)),
+    #         nn.Conv2d(64, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(128, 128, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #
+    #         nn.ReLU(),
+    #         nn.MaxPool2d((2, 2), (2, 2)),
+    #         nn.Conv2d(128, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(256, 256, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #
+    #         nn.ReLU(),
+    #         nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+    #         nn.Conv2d(256, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #
+    #         nn.ReLU(),
+    #         nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),  # AvgPool2d,
+    #         nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         nn.Conv2d(512, 512, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
+    #
+    #         nn.ReLU(),
+    #         nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
+    #     )
+    #     self.classifier = nn.Sequential(
+    #         nn.Dropout(0.1),
+    #         nn.Linear(512, 4096, bias=False),  # Linear,
+    #         nn.ReLU(),
+    #         nn.Dropout(0.1),
+    #         # nn.Linear(4096, 4096, bias=False),  # Linear,
+    #         # nn.ReLU(),
+    #         # nn.Dropout(0.1),
+    #         nn.Linear(4096, 100, bias=False)  # Linear,
+    #     )
+    #
+    #     self._initialize_weights()
     def __init__(self,  dr=0.1, num_classes=1000):
         super(VGG_15_max, self).__init__()
         self.features = nn.Sequential(
@@ -385,17 +445,14 @@ class VGG_15_max(nn.Module):
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
-            nn.Linear(512, 4096, bias=False),  # Linear,
+            nn.Linear(512*6*6, 4096, bias=False),  # Linear,
             nn.ReLU(),
             nn.Dropout(0.1),
             # nn.Linear(4096, 4096, bias=False),  # Linear,
             # nn.ReLU(),
             # nn.Dropout(0.1),
-            nn.Linear(4096, 100, bias=False)  # Linear,
+            nn.Linear(4096, 1000, bias=False)  # Linear,
         )
-
-        self._initialize_weights()
-
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -424,7 +481,7 @@ def vgg_15_max(pretrained=False, **kwargs):
     """
     model = VGG_15_max(**kwargs)
     if pretrained:
-        model_path = 'model_list/vgg15_61.pth.tar'
+        model_path = 'vgg15max.pth.tar'
         print('loading pre-trained model from '+model_path)
         # model_path = 'alexnet_XNOR_cpu.pth'
         pretrained_model = torch.load(model_path)
