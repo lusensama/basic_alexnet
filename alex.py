@@ -445,7 +445,7 @@ class VGG_15_max(nn.Module):
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
-            nn.Linear(512*6*6, 4096, bias=False),  # Linear,
+            nn.Linear(512*7*7, 4096, bias=False),  # Linear,
             nn.ReLU(),
             nn.Dropout(0.1),
             # nn.Linear(4096, 4096, bias=False),  # Linear,

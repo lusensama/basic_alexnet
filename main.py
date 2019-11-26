@@ -20,6 +20,7 @@ import torchvision.models as models
 from alex import alexnet, vgg_net, vgg_15_max, vgg_15_avg
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
+from torchsummary import summary
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
@@ -135,6 +136,7 @@ def main_worker(gpu, ngpus_per_node, args):
     elif args.arch == 'vgg15m':
         print("=> creating model '{}'".format(args.arch))
         model = vgg_15_max(pretrained=args.pretrained)
+        # summary(model, (3,224,227))
     elif args.arch == 'vgg15a':
         print("=> creating model '{}'".format(args.arch))
         model = vgg_15_avg(pretrained=args.pretrained)
