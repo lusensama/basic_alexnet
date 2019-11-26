@@ -453,6 +453,7 @@ class VGG_15_max(nn.Module):
             # nn.Dropout(0.1),
             nn.Linear(4096, 1000, bias=False)  # Linear,
         )
+        self._initialize_weights()
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
