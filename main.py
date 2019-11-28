@@ -271,8 +271,10 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.evaluate:
         validate(val_loader, model, criterion, args)
         return
-
-    writer = SummaryWriter('runs/imagenet_training')
+    if args.dataset =='imagenet':
+        writer = SummaryWriter('runs/imagenet_training')
+    else:
+        writer = SummaryWriter('runs/cifar100_training')
     lr = args.lr
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
