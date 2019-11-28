@@ -395,7 +395,7 @@ class VGG_15_max(nn.Module):
     #     )
     #
     #     self._initialize_weights()
-    def __init__(self,  dr=0.1, num_classes=1000):
+    def __init__(self,  dr=0.1, num_classes=1000, linea=512*7*7):
         super(VGG_15_max, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
@@ -445,7 +445,7 @@ class VGG_15_max(nn.Module):
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
-            nn.Linear(512*7*7, 4096, bias=False),  # Linear,
+            nn.Linear(linea, 4096, bias=False),  # Linear,
             nn.ReLU(),
             nn.Dropout(0.1),
             # nn.Linear(4096, 4096, bias=False),  # Linear,
@@ -483,7 +483,7 @@ def vgg_15_max(pretrained=False,dataset='imagenet',**kwargs):
     if dataset == 'imagenet':
         model = VGG_15_max(num_classes=1000, **kwargs)
     elif dataset == 'cifar100':
-        model = VGG_15_max(num_classes=100,**kwargs)
+        model = VGG_15_max(num_classes=100, linea=512,**kwargs)
     if pretrained:
         model_path = 'vgg15max.pth.tar'
         print('loading pre-trained model from '+model_path)
