@@ -451,7 +451,7 @@ class VGG_15_max(nn.Module):
             # nn.Linear(4096, 4096, bias=False),  # Linear,
             # nn.ReLU(),
             # nn.Dropout(0.1),
-            nn.Linear(4096, 1000, bias=False)  # Linear,
+            nn.Linear(4096, num_classes, bias=False)  # Linear,
         )
         self._initialize_weights()
     def _initialize_weights(self):
@@ -473,14 +473,17 @@ class VGG_15_max(nn.Module):
         x = self.classifier(x)
         return x
 
-def vgg_15_max(pretrained=False, **kwargs):
+def vgg_15_max(pretrained=False,dataset='imagenet',**kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = VGG_15_max(**kwargs)
+    if dataset == 'imagenet':
+        model = VGG_15_max(num_classes=1000, **kwargs)
+    elif dataset == 'cifar100':
+        model = VGG_15_max(num_classes=100,**kwargs)
     if pretrained:
         model_path = 'vgg15max.pth.tar'
         print('loading pre-trained model from '+model_path)

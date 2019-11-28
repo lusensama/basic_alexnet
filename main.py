@@ -130,20 +130,20 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     if args.arch == 'alexnet':
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = alexnet(pretrained=args.pretrained)
+        model = alexnet(pretrained=args.pretrained, datasets=args.dataset)
     elif args.arch == 'vgg16':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_net(pretrained=args.pretrained)
+        model = vgg_net(pretrained=args.pretrained, datasets=args.dataset)
 
     elif args.arch == 'vgg15m':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_max(pretrained=args.pretrained)
+        model = vgg_15_max(pretrained=args.pretrained, datasets=args.dataset)
         # summary(model, (3,224,227))
     elif args.arch == 'vgg15a':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_avg(pretrained=args.pretrained)
+        model = vgg_15_avg(pretrained=args.pretrained, datasets=args.dataset)
     elif args.arch == 'ovgg':
-        model = vgg16_bn()
+        model = vgg16_bn(datasets=args.dataset)
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
