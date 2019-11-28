@@ -130,20 +130,20 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     if args.arch == 'alexnet':
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = alexnet(pretrained=args.pretrained, datasets=args.dataset)
+        model = alexnet(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'vgg16':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_net(pretrained=args.pretrained, datasets=args.dataset)
+        model = vgg_net(pretrained=args.pretrained, dataset=args.dataset)
 
     elif args.arch == 'vgg15m':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_max(pretrained=args.pretrained, datasets=args.dataset)
+        model = vgg_15_max(pretrained=args.pretrained, dataset=args.dataset)
         # summary(model, (3,224,227))
     elif args.arch == 'vgg15a':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_avg(pretrained=args.pretrained, datasets=args.dataset)
+        model = vgg_15_avg(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'ovgg':
-        model = vgg16_bn(datasets=args.dataset)
+        model = vgg16_bn(dataset=args.dataset)
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
@@ -283,7 +283,7 @@ def main_worker(gpu, ngpus_per_node, args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
-        adjust_learning_rate(optimizer, epoch, lr)
+        adjust_learning_rate(optimizer, epoch, lr, args.dataset)
 
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, args, writer)
@@ -445,30 +445,42 @@ class ProgressMeter(object):
         return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
 
-def adjust_learning_rate(optimizer, epoch, lr):
+def adjust_learning_rate(optimizer, epoch, lr, dataset):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    if epoch<30:
-        pass
-    # elif 81 <= epoch < 122:
-    #     lr = lr * (0.1 ** 1)
-    elif 30 <= epoch < 60:
-        lr = lr * (0.1 ** 1)
-    # elif 27 <= epoch < 30:
-    #     lr = lr * (0.1 ** 3)
-    # elif 35 <= epoch < 40:
-    #     lr = lr * (0.1 ** 3)
-    # elif 42 <= epoch < 44:
-    #     lr = lr * (0.1 ** 3)*(0.5**1)
-    # elif 44 <= epoch < 46:
-    #     lr = lr * (0.1 ** 3)*(0.5**2)
-    # elif epoch >= 46:
-    #     lr = lr * (0.1 ** 3)*(0.5**1)
-    else:
-        lr = lr * (0.1 ** 2)
-    # lr = lr * (0.5 ** (epoch // 40))
-    # lr = args.lr * (0.1 ** (epoch // 15))
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+    if dataset == 'cifar100':
+        if epoch < 81:
+            pass
+        elif 81 <= epoch < 122:
+            lr = lr * (0.1 ** 1)
+        else:
+            lr = lr * (0.1 ** 2)
+        # lr = lr * (0.5 ** (epoch // 40))
+        # lr = args.lr * (0.1 ** (epoch // 15))
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+    if dataset == 'imagenet':
+        if epoch < 30:
+            pass
+        # elif 81 <= epoch < 122:
+        #     lr = lr * (0.1 ** 1)
+        elif 30 <= epoch < 60:
+            lr = lr * (0.1 ** 1)
+        # elif 27 <= epoch < 30:
+        #     lr = lr * (0.1 ** 3)
+        # elif 35 <= epoch < 40:
+        #     lr = lr * (0.1 ** 3)
+        # elif 42 <= epoch < 44:
+        #     lr = lr * (0.1 ** 3)*(0.5**1)
+        # elif 44 <= epoch < 46:
+        #     lr = lr * (0.1 ** 3)*(0.5**2)
+        # elif epoch >= 46:
+        #     lr = lr * (0.1 ** 3)*(0.5**1)
+        else:
+            lr = lr * (0.1 ** 2)
+        # lr = lr * (0.5 ** (epoch // 40))
+        # lr = args.lr * (0.1 ** (epoch // 15))
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
 
 
 def accuracy(output, target, topk=(1,)):
