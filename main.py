@@ -27,6 +27,8 @@ parser.add_argument('data', metavar='DIR',
                     help='path to dataset')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='alexnet',
                     help='alexnet and vgg only')
+parser.add_argument('-d', '--dataset', metavar='DATASET', default='CIFAR100',
+                    help='IMAGENET or CIFAR100')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=60, type=int, metavar='N',
@@ -296,7 +298,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
                 'optimizer' : optimizer.state_dict(),
-            }, is_best, filename=args.arch)
+            }, is_best, filename='{}_{}'.format(args.arch, args.dataset))
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args, writer):
