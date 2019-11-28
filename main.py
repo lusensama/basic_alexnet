@@ -214,66 +214,70 @@ def main_worker(gpu, ngpus_per_node, args):
     # Data loading code
     traindir = os.path.join(args.data, 'train')
     valdir = os.path.join(args.data, 'val')
-    ''' imagenet'''
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
+    if args.dataset == 'imagenet':
+        ''' imagenet'''
 
-    train_dataset = datasets.ImageFolder(
-        traindir,
-        transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            normalize,
-        ]))
-    ''' imagenet '''
-    '''cifar100'''
-    # normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
-    #                                  std=[0.5, 0.5, 0.5])
-    #
-    # trainset = datasets.CIFAR100('./cifar100', train=True,
-    #                                          transform=transforms.Compose([
-    #                                              transforms.RandomCrop(32, padding=4),
-    #                                              transforms.RandomHorizontalFlip(0.5),
-    #                                              transforms.ToTensor(),
-    #                                              normalize, ]),
-    #                                          target_transform=None, download=True)
-    # train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
-    #                                           shuffle=True, num_workers=2)
-    #
-    # testset = datasets.CIFAR100('./cifar100', train=False,
-    #                                         transform=transforms.Compose([
-    #                                             transforms.ToTensor(),
-    #                                             normalize, ]),
-    #                                         target_transform=None, download=True)
-    # val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
-    #                                          shuffle=False, num_workers=2)
-    '''cifar100'''
-    if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-    else:
-        train_sampler = None
 
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
-        num_workers=args.workers, pin_memory=True, sampler=train_sampler)
+        train_dataset = datasets.ImageFolder(
+            traindir,
+            transforms.Compose([
+                transforms.RandomResizedCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ]))
+        if args.distributed:
+            train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        else:
+            train_sampler = None
 
-    val_loader = torch.utils.data.DataLoader(
-        datasets.ImageFolder(valdir, transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            normalize,
-        ])),
-        batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
+            num_workers=args.workers, pin_memory=True, sampler=train_sampler)
+
+        val_loader = torch.utils.data.DataLoader(
+            datasets.ImageFolder(valdir, transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                normalize,
+            ])),
+            batch_size=args.batch_size, shuffle=False,
+            num_workers=args.workers, pin_memory=True)
+        ''' imagenet '''
+    elif args.dataset == 'cifar100':
+        '''cifar100'''
+        # normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
+        #                                  std=[0.5, 0.5, 0.5])
+
+        trainset = datasets.CIFAR100('./cifar100', train=True,
+                                                 transform=transforms.Compose([
+                                                     transforms.RandomCrop(32, padding=4),
+                                                     transforms.RandomHorizontalFlip(0.5),
+                                                     transforms.ToTensor(),
+                                                     normalize, ]),
+                                                 target_transform=None, download=True)
+        train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
+                                                  shuffle=True, num_workers=2)
+
+        testset = datasets.CIFAR100('./cifar100', train=False,
+                                                transform=transforms.Compose([
+                                                    transforms.ToTensor(),
+                                                    normalize, ]),
+                                                target_transform=None, download=True)
+        val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
+                                                 shuffle=False, num_workers=2)
+        '''cifar100'''
+
 
     if args.evaluate:
         validate(val_loader, model, criterion, args)
         return
     if args.dataset =='imagenet':
         writer = SummaryWriter('runs/imagenet_training')
-    else:
+    elif args.dataset == 'cifar100':
         writer = SummaryWriter('runs/cifar100_training')
     lr = args.lr
     for epoch in range(args.start_epoch, args.epochs):
@@ -286,8 +290,8 @@ def main_worker(gpu, ngpus_per_node, args):
 
         # evaluate on validation set
         acc1, acc5 = validate(val_loader, model, criterion, args)
-        writer.add_scalar('top1 accuracy', acc1, epoch)
-        writer.add_scalar('top5 accuracy', acc5, epoch)
+        writer.add_scalar('{} {} top1 accuracy'.format(args.dataset, args.arch), acc1, epoch)
+        writer.add_scalar('{} {} top5 accuracy'.format(args.dataset, args.arch), acc5, epoch)
         # remember best acc@1 and save checkpoint
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
@@ -344,7 +348,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, writer):
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
-        writer.add_scalar('training loss', loss.item(), epoch * len(train_loader) + i)
+        writer.add_scalar('{} {} training losses'.format(args.dataset, args.arch), loss.item(), epoch * len(train_loader) + i)
         if i % args.print_freq == 0:
             progress.display(i)
 
