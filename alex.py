@@ -227,7 +227,7 @@ def vgg_net(pretrained=False, **kwargs):
 
 
 class VGG_15_avg(nn.Module):
-    def __init__(self,  dr=0.1, num_classes=1000):
+    def __init__(self,  dr=0.1, num_classes=1000, linea=512*7*7):
         super(VGG_15_avg, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 64, (3, 3), (1, 1), (1, 1), 1, 1, bias=False),
@@ -277,13 +277,13 @@ class VGG_15_avg(nn.Module):
         )
         self.classifier = nn.Sequential(
             nn.Dropout(0.1),
-            nn.Linear(512, 4096, bias=False),  # Linear,
+            nn.Linear(linea, 4096, bias=False),  # Linear,
             nn.ReLU(),
             nn.Dropout(0.1),
             # nn.Linear(4096, 4096, bias=False),  # Linear,
             # nn.ReLU(),
             # nn.Dropout(0.1),
-            nn.Linear(4096, 100, bias=False)  # Linear,
+            nn.Linear(4096, num_classes, bias=False)  # Linear,
         )
 
         self._initialize_weights()
@@ -307,14 +307,17 @@ class VGG_15_avg(nn.Module):
         x = self.classifier(x)
         return x
 
-def vgg_15_avg(pretrained=False, **kwargs):
+def vgg_15_avg(pretrained=False, dataset='imagenet' , **kwargs):
     r"""AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = VGG_15_avg(**kwargs)
+    if dataset == 'imagenet':
+        model = VGG_15_avg(num_classes=1000, **kwargs)
+    elif dataset == 'cifar100':
+        model = VGG_15_avg(num_classes=100, linea=512,**kwargs)
     if pretrained:
         model_path = 'vgg15avg.pth.tar'
         print('loading pre-trained model from '+model_path)
