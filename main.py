@@ -27,8 +27,8 @@ parser.add_argument('data', metavar='DIR',
                     help='path to dataset')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='alexnet',
                     help='alexnet and vgg only')
-parser.add_argument('-d', '--dataset', metavar='DATASET', default='CIFAR100',
-                    help='IMAGENET or CIFAR100')
+parser.add_argument('-d', '--dataset', metavar='DATASET', default='cifar100',
+                    help='imagenet or cifar100')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=60, type=int, metavar='N',

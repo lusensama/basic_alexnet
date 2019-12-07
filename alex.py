@@ -316,7 +316,7 @@ def vgg_15_avg(pretrained=False, dataset='imagenet' , **kwargs):
     """
     if dataset == 'imagenet':
         model = VGG_15_avg(num_classes=1000, **kwargs)
-    elif dataset == 'CIFAR100':
+    elif dataset == 'cifar100':
         model = VGG_15_avg(num_classes=100, linea=512,**kwargs)
     if pretrained:
         model_path = 'vgg15avg.pth.tar'
@@ -485,7 +485,7 @@ def vgg_15_max(pretrained=False,dataset='imagenet',**kwargs):
     """
     if dataset == 'imagenet':
         model = VGG_15_max(num_classes=1000, **kwargs)
-    elif dataset == 'CIFAR100':
+    elif dataset == 'cifar100':
         model = VGG_15_max(num_classes=100, linea=512,**kwargs)
     if pretrained:
         model_path = 'vgg15max.pth.tar'
