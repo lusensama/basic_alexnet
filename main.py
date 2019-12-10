@@ -72,7 +72,8 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
                          'N processes per node, which has N GPUs. This is the '
                          'fastest way to use PyTorch for either single node or '
                          'multi node data parallel training')
-
+parser.add_argument('--workdir', action='store', default=None,
+                    help='the path to store everything')
 best_acc1 = 0
 
 
@@ -276,9 +277,9 @@ def main_worker(gpu, ngpus_per_node, args):
         validate(val_loader, model, criterion, args)
         return
     if args.dataset =='imagenet':
-        writer = SummaryWriter('runs/imagenet_training')
+        writer = SummaryWriter(args.workdir + '/'+ 'runs/imagenet_training')
     elif args.dataset == 'cifar100':
-        writer = SummaryWriter('runs/cifar100_training')
+        writer = SummaryWriter(args.workdir + '/'+ 'runs/cifar100_training')
     lr = args.lr
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
@@ -304,7 +305,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
                 'optimizer' : optimizer.state_dict(),
-            }, is_best, filename='{}_{}'.format(args.arch, args.dataset))
+            }, is_best, filename='{}/{}_{}'.format(args.workdir, args.arch, args.dataset))
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args, writer):
@@ -398,7 +399,7 @@ def validate(val_loader, model, criterion, args):
     return top1.avg, top5.avg
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(state, is_best, filename='temp'):
     torch.save(state, filename+'_checkpoint.pth.tar')
     if is_best:
         shutil.copyfile(filename+'_checkpoint.pth.tar', filename+'model_best.pth.tar')
