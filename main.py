@@ -143,7 +143,7 @@ def main_worker(gpu, ngpus_per_node, args):
     elif args.arch == 'vgg15a':
         print("=> creating model '{}'".format(args.arch))
         model = vgg_15_avg(pretrained=args.pretrained, dataset=args.dataset)
-    elif args.arch == 'vgg15aa':
+    elif args.arch == 'vgg15ab':
         print("=> creating model '{}'".format(args.arch))
         model = vgg_15_avg2(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'ovgg':
