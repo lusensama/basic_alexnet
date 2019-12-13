@@ -392,7 +392,7 @@ class VGG_15_avg2(nn.Module):
             # nn.Linear(4096, 4096, bias=False),  # Linear,
             # nn.ReLU(),
             # nn.Dropout(0.1),
-            nn.Linear(4096, num_classes, bias=False)  # Linear,
+            nn.Linear(4096, 100, bias=False)  # Linear,
         )
 
         self._initialize_weights()
