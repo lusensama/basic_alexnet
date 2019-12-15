@@ -17,7 +17,7 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
-from alex import alexnet, vgg_net, vgg_15_max, vgg_15_avg, vgg_15_avg2
+from alex import alexnet, vgg_net, vgg_15_maxa, vgg_15_maxb, vgg_15_avga, vgg_15_avgb
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
 from torchsummary import summary
@@ -136,16 +136,19 @@ def main_worker(gpu, ngpus_per_node, args):
         print("=> creating model '{}'".format(args.arch))
         model = vgg_net(pretrained=args.pretrained, dataset=args.dataset)
 
-    elif args.arch == 'vgg15m':
+    elif args.arch == 'vgg15ma':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_max(pretrained=args.pretrained, dataset=args.dataset)
+        model = vgg_15_maxa(pretrained=args.pretrained, dataset=args.dataset)
+    elif args.arch == 'vgg15mb':
+        print("=> creating model '{}'".format(args.arch))
+        model = vgg_15_maxb(pretrained=args.pretrained, dataset=args.dataset)
         # summary(model, (3,224,227))
-    elif args.arch == 'vgg15a':
+    elif args.arch == 'vgg15aa':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_avg(pretrained=args.pretrained, dataset=args.dataset)
+        model = vgg_15_avga(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'vgg15ab':
         print("=> creating model '{}'".format(args.arch))
-        model = vgg_15_avg2(pretrained=args.pretrained, dataset=args.dataset)
+        model = vgg_15_avgb(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'ovgg':
         model = vgg16_bn(dataset=args.dataset)
     else:
