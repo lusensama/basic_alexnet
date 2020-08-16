@@ -18,6 +18,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 from alex import alexnet, vgg_net, vgg_15_maxa, vgg_15_maxb, vgg_15_avga, vgg_15_avgb
+from sqeezenet import squeezenet1_1
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
 from torchsummary import summary
@@ -151,6 +152,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model = vgg_15_avgb(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'ovgg':
         model = vgg16_bn(dataset=args.dataset)
+    elif args.arch == 'sq':
+        model = squeezenet1_1(pretrained=False)
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
@@ -204,15 +207,17 @@ def main_worker(gpu, ngpus_per_node, args):
                 # Map model to be loaded to specified single gpu.
                 loc = 'cuda:{}'.format(args.gpu)
                 checkpoint = torch.load(args.resume, map_location=loc)
-            args.start_epoch = checkpoint['epoch']
-            best_acc1 = checkpoint['best_acc1']
+            # args.start_epoch = checkpoint['epoch']
+            # best_acc1 = checkpoint['best_acc1']
             if args.gpu is not None:
                 # best_acc1 may be from a checkpoint from a different GPU
                 best_acc1 = best_acc1.to(args.gpu)
-            model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            print("=> loaded checkpoint '{}' (epoch {})"
-                  .format(args.resume, checkpoint['epoch']))
+            model.load_state_dict(checkpoint, strict=True)
+            # torch.save(checkpoint['state_dict'], args.resume + 'cleanVer')
+            # exit(0)
+            # optimizer.load_state_dict(checkpoint['optimizer'])
+            # print("=> loaded checkpoint '{}' (epoch {})"
+            #       .format(args.resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
@@ -221,11 +226,11 @@ def main_worker(gpu, ngpus_per_node, args):
     # Data loading code
     traindir = os.path.join(args.data, 'train')
     valdir = os.path.join(args.data, 'val')
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+
     if args.dataset == 'imagenet':
         ''' imagenet'''
-
+        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                         std=[0.229, 0.224, 0.225])
 
         train_dataset = datasets.ImageFolder(
             traindir,
@@ -256,9 +261,10 @@ def main_worker(gpu, ngpus_per_node, args):
         ''' imagenet '''
     elif args.dataset == 'cifar100':
         '''cifar100'''
+        normalize = transforms.Normalize(mean=[0.507, 0.487, 0.441],
+                                         std=[0.267, 0.256, 0.276])
         # normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
         #                                  std=[0.5, 0.5, 0.5])
-
         trainset = datasets.CIFAR100('./cifar100', train=True,
                                                  transform=transforms.Compose([
                                                      transforms.RandomCrop(32, padding=4),
