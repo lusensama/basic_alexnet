@@ -21,7 +21,7 @@ from alex import alexnet, vgg_net, vgg_15_maxa, vgg_15_maxb, vgg_15_avga, vgg_15
 from sqeezenet import squeezenet1_1
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
-from torchsummary import summary
+# from torchsummary import summary
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
