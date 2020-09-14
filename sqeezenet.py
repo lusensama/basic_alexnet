@@ -56,7 +56,7 @@ class SqueezeNet(nn.Module):
             )
         elif version == '1_1':
             self.features = nn.Sequential(
-                nn.Conv2d(3, 64, kernel_size=3, stride=2),
+                nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
                 nn.ReLU(inplace=True),
                 nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(64, 16, 64, 64),
@@ -78,7 +78,7 @@ class SqueezeNet(nn.Module):
                              "1_0 or 1_1 expected".format(version=version))
 
         # Final convolution is initialized differently from the rest
-        final_conv = nn.Conv2d(512, self.num_classes, kernel_size=1)
+        final_conv = nn.Conv2d(512, self.num_classes, kernel_size=1, bias=False)
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.5),
             final_conv,
