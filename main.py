@@ -207,17 +207,17 @@ def main_worker(gpu, ngpus_per_node, args):
                 # Map model to be loaded to specified single gpu.
                 loc = 'cuda:{}'.format(args.gpu)
                 checkpoint = torch.load(args.resume, map_location=loc)
-            # args.start_epoch = checkpoint['epoch']
-            # best_acc1 = checkpoint['best_acc1']
+            args.start_epoch = checkpoint['epoch']
+            best_acc1 = checkpoint['best_acc1']
             if args.gpu is not None:
                 # best_acc1 may be from a checkpoint from a different GPU
                 best_acc1 = best_acc1.to(args.gpu)
-            model.load_state_dict(checkpoint, strict=True)
+            model.load_state_dict(checkpoint['state_dict'], strict=True)
             # torch.save(checkpoint['state_dict'], args.resume + 'cleanVer')
             # exit(0)
-            # optimizer.load_state_dict(checkpoint['optimizer'])
-            # print("=> loaded checkpoint '{}' (epoch {})"
-            #       .format(args.resume, checkpoint['epoch']))
+            optimizer.load_state_dict(checkpoint['optimizer'])
+            print("=> loaded checkpoint '{}' (epoch {})"
+                  .format(args.resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
