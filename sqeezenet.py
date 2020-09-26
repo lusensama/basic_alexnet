@@ -9,6 +9,27 @@ model_urls = {
     'squeezenet1_1': 'https://download.pytorch.org/models/squeezenet1_1-f364aa15.pth',
 }
 
+class FirePool(nn.Module):
+
+    def __init__(self, inplanes, squeeze_planes,
+                 expand1x1_planes, expand3x3_planes):
+        super(FirePool, self).__init__()
+        self.inplanes = inplanes
+        self.squeeze = nn.Conv2d(inplanes, squeeze_planes, kernel_size=1, bias=False)
+        self.squeeze_activation = nn.ReLU(inplace=True)
+        self.expand1x1 = nn.Conv2d(squeeze_planes, expand1x1_planes,
+                                   kernel_size=1, bias=False)
+        self.pool = nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True)
+        self.expand3x3 = nn.Conv2d(squeeze_planes, expand3x3_planes,
+                                   kernel_size=3, padding=1, bias=False)
+        self.expand3x3_activation = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        x = self.squeeze_activation(self.squeeze(x))
+
+        x = torch.cat([self.expand1x1(x), self.expand3x3(x)], 1)
+        x = self.pool(x)
+        return self.expand3x3_activation(x)
 
 class Fire(nn.Module):
 
@@ -57,14 +78,14 @@ class SqueezeNet(nn.Module):
         elif version == '1_1':
             self.features = nn.Sequential(
                 nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 nn.ReLU(inplace=True),
-                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(64, 16, 64, 64),
-                Fire(128, 16, 64, 64),
-                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                FirePool(128, 16, 64, 64),
+                # nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(128, 32, 128, 128),
-                Fire(256, 32, 128, 128),
-                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                FirePool(256, 32, 128, 128),
+                # nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(256, 48, 192, 192),
                 Fire(384, 48, 192, 192),
                 Fire(384, 64, 256, 256),
