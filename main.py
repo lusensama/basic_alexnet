@@ -17,7 +17,7 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
-from alex import alexnet, vgg_net, vgg_15_maxa, vgg_15_maxb, vgg_15_avga, vgg_15_avgb
+from alex import alexnet, vgg_net, vgg_15_maxa, vgg_15_maxb, vgg_15_avga, vgg_15_avgb, vgg_16
 from sqeezenet import squeezenet1_1
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
@@ -152,6 +152,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model = vgg_15_avgb(pretrained=args.pretrained, dataset=args.dataset)
     elif args.arch == 'ovgg':
         model = vgg16_bn(dataset=args.dataset)
+    elif args.arch == 'vgg_16':
+        model = vgg_16(dataset=args.dataset)
     elif args.arch == 'sq':
         model = squeezenet1_1(pretrained=False)
     else:
