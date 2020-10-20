@@ -427,6 +427,8 @@ def vgg_15_avgb(pretrained=False, dataset='cifar100' , **kwargs):
         model = VGG_15_avgb(num_classes=1000, **kwargs)
     elif dataset == 'cifar100':
         model = VGG_15_avgb(num_classes=100, linea=512,**kwargs)
+    elif dataset == 'cifar10':
+        model = VGG_15_avgb(num_classes=10, linea=512,**kwargs)
     if pretrained:
         model_path = 'vgg15avg.pth.tar'
         print('loading pre-trained model from '+model_path)
@@ -534,11 +536,11 @@ def vgg_16(pretrained=False, dataset='cifar100' , **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     if dataset == 'imagenet':
-        model = VGG_15_avgb(num_classes=1000, **kwargs)
+        model = VGG_16(num_classes=1000, **kwargs)
     elif dataset == 'cifar100':
-        model = VGG_15_avgb(num_classes=100, linea=512,**kwargs)
+        model = VGG_16(num_classes=100, linea=512,**kwargs)
     if pretrained:
-        model_path = 'vgg15avg.pth.tar'
+        model_path = 'vgg16.pth.tar'
         print('loading pre-trained model from '+model_path)
         # model_path = 'alexnet_XNOR_cpu.pth'
         pretrained_model = torch.load(model_path)

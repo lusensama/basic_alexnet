@@ -285,15 +285,35 @@ def main_worker(gpu, ngpus_per_node, args):
         val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
                                                  shuffle=False, num_workers=2)
         '''cifar100'''
+    elif args.dataset == 'cifar10':
+        '''cifar10'''
+        normalize = transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+        # normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
+        #                                  std=[0.5, 0.5, 0.5])
+        trainset = datasets.CIFAR100('./cifar10', train=True,
+                                                 transform=transforms.Compose([
+                                                     transforms.RandomCrop(32, padding=4),
+                                                     transforms.RandomHorizontalFlip(0.5),
+                                                     transforms.ToTensor(),
+                                                     normalize, ]),
+                                                 target_transform=None, download=True)
+        train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size,
+                                                  shuffle=True, num_workers=2)
+
+        testset = datasets.CIFAR100('./cifar10', train=False,
+                                                transform=transforms.Compose([
+                                                    transforms.ToTensor(),
+                                                    normalize, ]),
+                                                target_transform=None, download=True)
+        val_loader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size,
+                                                 shuffle=False, num_workers=2)
+        '''cifar100'''
 
 
     if args.evaluate:
         validate(val_loader, model, criterion, args)
         return
-    if args.dataset =='imagenet':
-        writer = SummaryWriter(args.workdir + '/'+ 'runs/imagenet_training')
-    elif args.dataset == 'cifar100':
-        writer = SummaryWriter(args.workdir + '/'+ 'runs/cifar100_training')
+    writer = SummaryWriter(args.workdir + '/'+ f'runs/{args.dataset}_training')
     lr = args.lr
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
