@@ -539,6 +539,8 @@ def vgg_16(pretrained=False, dataset='cifar100' , **kwargs):
         model = VGG_16(num_classes=1000, **kwargs)
     elif dataset == 'cifar100':
         model = VGG_16(num_classes=100, linea=512,**kwargs)
+    elif dataset == 'cifar10':
+        model = VGG_16(num_classes=10, linea=512,**kwargs)
     if pretrained:
         model_path = 'vgg16.pth.tar'
         print('loading pre-trained model from '+model_path)
