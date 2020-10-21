@@ -493,6 +493,17 @@ def adjust_learning_rate(optimizer, epoch, lr, dataset):
         # lr = args.lr * (0.1 ** (epoch // 15))
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
+    if dataset == 'cifar10':
+        if epoch < 150:
+            pass
+        elif 81 <= epoch < 250:
+            lr = lr * (0.1 ** 1)
+        else:
+            lr = lr * (0.1 ** 2)
+        # lr = lr * (0.5 ** (epoch // 40))
+        # lr = args.lr * (0.1 ** (epoch // 15))
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
     if dataset == 'imagenet':
         if epoch < 30:
             pass
