@@ -154,8 +154,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model = vgg16_bn(dataset=args.dataset)
     elif args.arch == 'vgg_16':
         model = vgg_16(dataset=args.dataset)
-    elif args.arch == 'sq':
-        model = squeezenet1_1(pretrained=False)
+    elif 'sq' in args.arch:
+        model = squeezenet1_1(pretrained=False, version=args.arch[-2:])
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models

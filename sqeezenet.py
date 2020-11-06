@@ -9,17 +9,39 @@ model_urls = {
     'squeezenet1_1': 'https://download.pytorch.org/models/squeezenet1_1-f364aa15.pth',
 }
 
-class FirePool(nn.Module):
+class FirePoolAvg(nn.Module):
 
     def __init__(self, inplanes, squeeze_planes,
                  expand1x1_planes, expand3x3_planes):
-        super(FirePool, self).__init__()
+        super(FirePoolAvg, self).__init__()
         self.inplanes = inplanes
         self.squeeze = nn.Conv2d(inplanes, squeeze_planes, kernel_size=1, bias=False)
         self.squeeze_activation = nn.ReLU(inplace=True)
         self.expand1x1 = nn.Conv2d(squeeze_planes, expand1x1_planes,
                                    kernel_size=1, bias=False)
         self.pool = nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True)
+        self.expand3x3 = nn.Conv2d(squeeze_planes, expand3x3_planes,
+                                   kernel_size=3, padding=1, bias=False)
+        self.expand3x3_activation = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        x = self.squeeze_activation(self.squeeze(x))
+
+        x = torch.cat([self.expand1x1(x), self.expand3x3(x)], 1)
+        x = self.pool(x)
+        return self.expand3x3_activation(x)
+
+class FirePoolMax(nn.Module):
+
+    def __init__(self, inplanes, squeeze_planes,
+                 expand1x1_planes, expand3x3_planes):
+        super(FirePoolMax, self).__init__()
+        self.inplanes = inplanes
+        self.squeeze = nn.Conv2d(inplanes, squeeze_planes, kernel_size=1, bias=False)
+        self.squeeze_activation = nn.ReLU(inplace=True)
+        self.expand1x1 = nn.Conv2d(squeeze_planes, expand1x1_planes,
+                                   kernel_size=1, bias=False)
+        self.pool = nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=True)
         self.expand3x3 = nn.Conv2d(squeeze_planes, expand3x3_planes,
                                    kernel_size=3, padding=1, bias=False)
         self.expand3x3_activation = nn.ReLU(inplace=True)
@@ -56,7 +78,7 @@ class Fire(nn.Module):
 
 class SqueezeNet(nn.Module):
 
-    def __init__(self, version='1_0', num_classes=1000):
+    def __init__(self, version='aa', num_classes=1000):
         super(SqueezeNet, self).__init__()
         self.num_classes = num_classes
         if version == '1_0':
@@ -75,7 +97,7 @@ class SqueezeNet(nn.Module):
                 nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(512, 64, 256, 256),
             )
-        elif version == '1_1':
+        elif version == 'aa':
             self.features = nn.Sequential(
                 nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
                 nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
@@ -87,6 +109,60 @@ class SqueezeNet(nn.Module):
                 Fire(128, 32, 128, 128),
                 # FirePool(256, 32, 128, 128),
                 Fire(256, 32, 128, 128),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(256, 48, 192, 192),
+                Fire(384, 48, 192, 192),
+                Fire(384, 64, 256, 256),
+                Fire(512, 64, 256, 256),
+            )
+        elif version == 'ab':
+            self.features = nn.Sequential(
+                nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                nn.ReLU(inplace=True),
+                Fire(64, 16, 64, 64),
+                FirePoolAvg(128, 16, 64, 64),
+                # Fire(128, 16, 64, 64),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(128, 32, 128, 128),
+                FirePoolAvg(256, 32, 128, 128),
+                # Fire(256, 32, 128, 128),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(256, 48, 192, 192),
+                Fire(384, 48, 192, 192),
+                Fire(384, 64, 256, 256),
+                Fire(512, 64, 256, 256),
+            )
+        elif version == 'ma':
+            self.features = nn.Sequential(
+                nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                nn.ReLU(inplace=True),
+                Fire(64, 16, 64, 64),
+                # FirePool(128, 16, 64, 64),
+                Fire(128, 16, 64, 64),
+                nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(128, 32, 128, 128),
+                # FirePool(256, 32, 128, 128),
+                Fire(256, 32, 128, 128),
+                nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(256, 48, 192, 192),
+                Fire(384, 48, 192, 192),
+                Fire(384, 64, 256, 256),
+                Fire(512, 64, 256, 256),
+            )
+        elif version == 'mb':
+            self.features = nn.Sequential(
+                nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                nn.ReLU(inplace=True),
+                Fire(64, 16, 64, 64),
+                FirePoolMax(128, 16, 64, 64),
+                # Fire(128, 16, 64, 64),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(128, 32, 128, 128),
+                FirePoolMax(256, 32, 128, 128),
+                # Fire(256, 32, 128, 128),
                 nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(256, 48, 192, 192),
                 Fire(384, 48, 192, 192),
@@ -144,7 +220,7 @@ def squeezenet1_0(pretrained=False, progress='', **kwargs):
     return _squeezenet('1_0', pretrained, progress, **kwargs)
 
 
-def squeezenet1_1(pretrained=False, progress='', **kwargs):
+def squeezenet1_1(pretrained=False, progress='', version='aa', **kwargs):
     r"""SqueezeNet 1.1 model from the `official SqueezeNet repo
     <https://github.com/DeepScale/SqueezeNet/tree/master/SqueezeNet_v1.1>`_.
     SqueezeNet 1.1 has 2.4x less computation and slightly fewer parameters
@@ -153,4 +229,4 @@ def squeezenet1_1(pretrained=False, progress='', **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _squeezenet('1_1', pretrained, progress, **kwargs)
+    return _squeezenet(version, pretrained, progress, **kwargs)
