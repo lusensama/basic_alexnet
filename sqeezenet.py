@@ -100,8 +100,8 @@ class SqueezeNet(nn.Module):
         elif version == 'aa':
             self.features = nn.Sequential(
                 nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
-                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 nn.ReLU(inplace=True),
+                nn.AvgPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(64, 16, 64, 64),
                 # FirePool(128, 16, 64, 64),
                 Fire(128, 16, 64, 64),
@@ -132,8 +132,8 @@ class SqueezeNet(nn.Module):
         elif version == 'ma':
             self.features = nn.Sequential(
                 nn.Conv2d(3, 64, kernel_size=3, stride=2, bias=False),
-                nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=True),
                 Fire(64, 16, 64, 64),
                 Fire(128, 16, 64, 64),
                 nn.MaxPool2d(kernel_size=3, stride=2, ceil_mode=True),
