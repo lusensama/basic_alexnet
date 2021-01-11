@@ -26,7 +26,7 @@ class VGG(nn.Module):
     def __init__(
         self,
         features: nn.Module,
-        num_classes: int = 1000,
+        num_classes: int = 100,
         init_weights: bool = True
     ) -> None:
         super(VGG, self).__init__()
@@ -100,7 +100,7 @@ def _vgg(arch: str, cfg: str, batch_norm: bool, pretrained: bool, progress: str,
     return model
 
 
-def vgg11(progress: str, pretrained: bool = False, **kwargs: Any) -> VGG:
+def vgg11(progress: str = '', pretrained: bool = False, **kwargs: Any) -> VGG:
     r"""VGG 11-layer model (configuration "A") from
     `"Very Deep Convolutional Networks For Large-Scale Image Recognition" <https://arxiv.org/pdf/1409.1556.pdf>`._
     Args:

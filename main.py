@@ -21,6 +21,7 @@ from alex import alexnet, vgg_net, vgg_15_maxa, vgg_15_maxb, vgg_15_avga, vgg_15
 from sqeezenet import squeezenet1_1
 from torch.utils.tensorboard import SummaryWriter
 from actual_vgg import vgg16_bn
+from vggs import vgg11
 # from torchsummary import summary
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
@@ -156,6 +157,9 @@ def main_worker(gpu, ngpus_per_node, args):
         model = vgg_16(dataset=args.dataset)
     elif 'sq' in args.arch:
         model = squeezenet1_1(pretrained=False, version=args.arch[-2:])
+    elif args.arch == 'vgg11':
+        print("=> creating model '{}'".format(args.arch))
+        model = vgg11()
     else:
         print("=> creating model '{}'".format(args.arch))
         # import torchvision.models as models
